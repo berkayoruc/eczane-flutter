@@ -91,8 +91,7 @@ class _MapPageState extends State<MapPage> {
         layers: [
           TileLayerOptions(
               maxZoom: 18,
-              urlTemplate:
-                  "https://stamen-tiles.a.ssl.fastly.net/watercolor/{z}/{x}/{y}.jpg",
+              urlTemplate: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
               subdomains: ['a', 'b', 'c'],
               tileProvider: NonCachingNetworkTileProvider()),
           MarkerClusterLayerOptions(
