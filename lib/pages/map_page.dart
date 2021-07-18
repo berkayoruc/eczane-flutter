@@ -18,21 +18,21 @@ class _MapPageState extends State<MapPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        elevation: 1,
-        backgroundColor: Colors.white,
-        actionsIconTheme: IconThemeData(
-          color: Colors.grey[900],
-        ),
-        actions: [
-          IconButton(
-              icon: Icon(
-                Icons.search,
-                size: 32,
-              ),
-              onPressed: () => print('22'))
-        ],
-      ),
+      // appBar: AppBar(
+      //   elevation: 1,
+      //   backgroundColor: Colors.white,
+      //   actionsIconTheme: IconThemeData(
+      //     color: Colors.grey[900],
+      //   ),
+      //   actions: [
+      //     IconButton(
+      //         icon: Icon(
+      //           Icons.search,
+      //           size: 32,
+      //         ),
+      //         onPressed: () => print('22'))
+      //   ],
+      // ),
       extendBody: true,
       body: Center(
         child: FutureBuilder(
@@ -83,18 +83,20 @@ class _MapPageState extends State<MapPage> {
             MarkerClusterPlugin(),
           ],
           interactiveFlags: InteractiveFlag.all & ~InteractiveFlag.rotate,
-          maxZoom: 20,
+          maxZoom: 18,
           center:
               markers4map.isNotEmpty ? markers4map.first.point : LatLng(41, 28),
           zoom: 10.0,
         ),
         layers: [
           TileLayerOptions(
-              maxZoom: 20,
-              urlTemplate: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-              subdomains: ['a', 'b', 'c']),
+              maxZoom: 18,
+              urlTemplate:
+                  "https://stamen-tiles.a.ssl.fastly.net/watercolor/{z}/{x}/{y}.jpg",
+              subdomains: ['a', 'b', 'c'],
+              tileProvider: NonCachingNetworkTileProvider()),
           MarkerClusterLayerOptions(
-            maxClusterRadius: 120,
+            maxClusterRadius: 80,
             size: Size(40, 40),
             anchor: AnchorPos.align(AnchorAlign.center),
             fitBoundsOptions: FitBoundsOptions(
@@ -105,9 +107,10 @@ class _MapPageState extends State<MapPage> {
                 color: Colors.transparent,
                 borderStrokeWidth: 3),
             markers: markers4map,
+            disableClusteringAtZoom: 16,
             builder: (context, markers) {
               return FloatingActionButton(
-                backgroundColor: Colors.redAccent,
+                backgroundColor: Colors.red[800],
                 onPressed: null,
                 child: Text(markers.length.toString()),
               );
