@@ -2,8 +2,8 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:eczaneistanbul/models/pharmacy.dart';
-import 'package:flutter/foundation.dart';
-import 'package:hive/hive.dart';
+// import 'package:flutter/foundation.dart';
+// import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
 
 Future<List> getPharmacies(
@@ -11,7 +11,7 @@ Future<List> getPharmacies(
 ) async {
   var values = [];
   final response = await http.get(
-      'https://openapi.izmir.bel.tr/api/ibb/eczaneler');
+      Uri.parse('https://openapi.izmir.bel.tr/api/ibb/eczaneler'));
   if (response.statusCode == HttpStatus.ok) {
     final pharmacy = jsonDecode(response.body);
     for (var i = 0; i < pharmacy.length; i++) {

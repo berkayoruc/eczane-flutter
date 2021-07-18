@@ -1,7 +1,8 @@
 import 'package:eczaneistanbul/core/services/pharmacy.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
-import 'package:latlong/latlong.dart';
+import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
+import 'package:latlong2/latlong.dart';
 
 class MapPage extends StatefulWidget {
   const MapPage({Key key}) : super(key: key);
@@ -78,6 +79,9 @@ class _MapPageState extends State<MapPage> {
     });
     return FlutterMap(
         options: MapOptions(
+          plugins: [
+            MarkerClusterPlugin(),
+          ],
           interactiveFlags: InteractiveFlag.all & ~InteractiveFlag.rotate,
           maxZoom: 20,
           center:
@@ -89,7 +93,27 @@ class _MapPageState extends State<MapPage> {
               maxZoom: 20,
               urlTemplate: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
               subdomains: ['a', 'b', 'c']),
-          MarkerLayerOptions(markers: markers4map)
+          MarkerClusterLayerOptions(
+            maxClusterRadius: 120,
+            size: Size(40, 40),
+            anchor: AnchorPos.align(AnchorAlign.center),
+            fitBoundsOptions: FitBoundsOptions(
+              padding: EdgeInsets.all(50),
+            ),
+            polygonOptions: PolygonOptions(
+                borderColor: Colors.transparent,
+                color: Colors.transparent,
+                borderStrokeWidth: 3),
+            markers: markers4map,
+            builder: (context, markers) {
+              return FloatingActionButton(
+                backgroundColor: Colors.redAccent,
+                onPressed: null,
+                child: Text(markers.length.toString()),
+              );
+            },
+          ),
+          // MarkerLayerOptions(markers: markers4map)
         ]);
   }
 }
