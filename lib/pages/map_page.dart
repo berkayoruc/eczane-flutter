@@ -1,6 +1,7 @@
+import 'package:eczaneistanbul/core/services/pharmacy.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
-import 'package:latlong2/latlong.dart';
+import 'package:latlong/latlong.dart';
 
 class MapPage extends StatefulWidget {
   const MapPage({Key key}) : super(key: key);
@@ -10,6 +11,8 @@ class MapPage extends StatefulWidget {
 }
 
 class _MapPageState extends State<MapPage> {
+  List<Marker> markers4map = [];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -31,46 +34,62 @@ class _MapPageState extends State<MapPage> {
       ),
       extendBody: true,
       body: Center(
-        child: FlutterMap(
-            options: MapOptions(
-              center: LatLng(41, 29),
-              zoom: 10.0,
-            ),
-            layers: [
-              TileLayerOptions(
-                  maxZoom: 24,
-                  urlTemplate:
-                      "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-                  subdomains: ['a', 'b', 'c']),
-              MarkerLayerOptions(markers: [
-                Marker(
-                  width: 40.0,
-                  height: 40.0,
-                  point: LatLng(40.9873, 29.1),
-                  builder: (ctx) => Container(
-                    child: Image.asset('assets/png/eczane-pin.png'),
-                  ),
-                ),
-                Marker(
-                  anchorPos: AnchorPos.align(AnchorAlign.top), //dogru
-                  width: 40.0,
-                  height: 40.0,
-                  point: LatLng(41, 29.1),
-                  builder: (ctx) => Container(
-                    child: Image.asset('assets/png/nobetci-pin.png'),
-                  ),
-                ),
-                Marker(
-                  width: 40.0,
-                  height: 40.0,
-                  point: LatLng(41.1, 29),
-                  builder: (ctx) => Container(
-                    child: FlutterLogo(),
-                  ),
-                ),
-              ])
-            ]),
+        child: FutureBuilder(
+          future: getPharmacies(false),
+          builder: (BuildContext context, AsyncSnapshot snapshot) {
+            switch (snapshot.connectionState) {
+              case ConnectionState.none:
+              case ConnectionState.waiting:
+                return Column(
+                  children: [Text('Yukleniyor...')],
+                );
+              default:
+                if (snapshot.hasError) {
+                  return Text(snapshot.error);
+                } else {
+                  return createMap(snapshot.data);
+                }
+            }
+          },
+        ),
       ),
     );
+  }
+
+  bool isNumeric(String str) {
+    if (str == null) {
+      return false;
+    }
+    return double.tryParse(str) != null;
+  }
+
+  FlutterMap createMap(data) {
+    markers4map.clear();
+    data.forEach((pharmacy) {
+      isNumeric(pharmacy.locx) && isNumeric(pharmacy.locy)
+          ? markers4map.add(Marker(
+              anchorPos: AnchorPos.align(AnchorAlign.top),
+              width: 40,
+              height: 40,
+              point: LatLng(
+                  double.parse(pharmacy.locx), double.parse(pharmacy.locy)),
+              builder: (ctx) => Image.asset('assets/png/eczane-pin.png')))
+          : print('s');
+    });
+    return FlutterMap(
+        options: MapOptions(
+          interactiveFlags: InteractiveFlag.all & ~InteractiveFlag.rotate,
+          maxZoom: 20,
+          center:
+              markers4map.isNotEmpty ? markers4map.first.point : LatLng(41, 28),
+          zoom: 10.0,
+        ),
+        layers: [
+          TileLayerOptions(
+              maxZoom: 20,
+              urlTemplate: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+              subdomains: ['a', 'b', 'c']),
+          MarkerLayerOptions(markers: markers4map)
+        ]);
   }
 }
