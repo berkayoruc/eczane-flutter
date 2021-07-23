@@ -1,4 +1,4 @@
-import 'package:eczaneistanbul/core/services/pharmacy.dart';
+import 'package:eczaneistanbul/core/services/get_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
@@ -33,10 +33,10 @@ class _MapPageState extends State<MapPage> {
       //         onPressed: () => print('22'))
       //   ],
       // ),
-      extendBody: true,
+      // extendBody: true,
       body: Center(
         child: FutureBuilder(
-          future: getPharmacies(false),
+          future: getParksIBB(),
           builder: (BuildContext context, AsyncSnapshot snapshot) {
             switch (snapshot.connectionState) {
               case ConnectionState.none:
@@ -46,7 +46,7 @@ class _MapPageState extends State<MapPage> {
                 );
               default:
                 if (snapshot.hasError) {
-                  return Text(snapshot.error);
+                  return Text(snapshot.error.toString());
                 } else {
                   return createMap(snapshot.data);
                 }
@@ -66,14 +66,13 @@ class _MapPageState extends State<MapPage> {
 
   FlutterMap createMap(data) {
     markers4map.clear();
-    data.forEach((pharmacy) {
-      isNumeric(pharmacy.locx) && isNumeric(pharmacy.locy)
+    data.forEach((park) {
+      isNumeric(park.lat.toString()) && isNumeric(park.lon.toString())
           ? markers4map.add(Marker(
               anchorPos: AnchorPos.align(AnchorAlign.top),
-              width: 40,
-              height: 40,
-              point: LatLng(
-                  double.parse(pharmacy.locx), double.parse(pharmacy.locy)),
+              width: 50,
+              height: 50,
+              point: LatLng(park.lat, park.lon),
               builder: (ctx) => Image.asset('assets/png/eczane-pin.png')))
           : print('s');
     });
@@ -96,7 +95,7 @@ class _MapPageState extends State<MapPage> {
               tileProvider: NonCachingNetworkTileProvider()),
           MarkerClusterLayerOptions(
             maxClusterRadius: 80,
-            size: Size(40, 40),
+            size: Size(50, 50),
             anchor: AnchorPos.align(AnchorAlign.center),
             fitBoundsOptions: FitBoundsOptions(
               padding: EdgeInsets.all(50),
@@ -109,9 +108,12 @@ class _MapPageState extends State<MapPage> {
             disableClusteringAtZoom: 16,
             builder: (context, markers) {
               return FloatingActionButton(
-                backgroundColor: Colors.red[800],
+                backgroundColor: Colors.green[800],
                 onPressed: null,
-                child: Text(markers.length.toString()),
+                child: Text(
+                  markers.length.toString(),
+                  style: TextStyle(fontSize: 16),
+                ),
               );
             },
           ),
